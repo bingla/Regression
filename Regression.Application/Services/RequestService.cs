@@ -11,7 +11,7 @@ namespace Regression.Application.Services
         public RequestService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            //_httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         }
 
         public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, Guid testId, RunSettings settings)

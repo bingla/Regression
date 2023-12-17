@@ -15,16 +15,5 @@ namespace Regression.Domain.Models.Results
         public Uri? Uri { get; init; }
         public HttpStatusCode? HttpStatusCode { get; set; }
         public TestStatusCode TestStatusCode { get; set; } = TestStatusCode.Incomplete;
-
-        public TestResult()
-        { }
-
-        public TestResult(Guid instanceId, Guid testId, Guid runId, Uri? uri)
-        {
-            InstanceId = instanceId;
-            TestId = testId;
-            RunId = runId;
-            Uri = uri;
-        }
     }
 }

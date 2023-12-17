@@ -12,8 +12,8 @@ namespace Regression.Domain.Entities
         [Key]
         public Guid Id { get; set; }
         public Environment Environment { get; set; } = Environment.None;
-        public int NumIterations { get; set; } = 10;
-        public int NumAgents { get; set; } = 10;
+        public int NumIterations { get; set; } = 1;
+        public int NumAgents { get; set; } = 1;
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? AppId { get; set; }

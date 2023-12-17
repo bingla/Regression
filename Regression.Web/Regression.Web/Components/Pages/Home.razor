@@ -19,6 +19,7 @@ Welcome to your new app.
             RunId = Guid.NewGuid(),
             TestId = Guid.NewGuid()
         };
-        var response = await _requestService.SendAsync(HttpMethod.Get, "http://www.google.com", runSettings.TestId, runSettings);
+        var uri = new Uri("https://api.oceandrivers.com/v1.0/getEasyWind/EW013/");
+        var response = await _requestService.SendAsync(HttpMethod.Get, uri, runSettings.TestId, runSettings);
     }
 }

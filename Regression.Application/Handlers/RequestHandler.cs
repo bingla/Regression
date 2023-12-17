@@ -16,33 +16,13 @@ namespace Regression.Application.Handlers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // Check for RunId and TestId
-            if (!Guid.TryParse(request.GetHeaderValue(Globals.HeaderNames.RunId) ?? string.Empty, out var runId))
-            {
-                return GenerateErrorHttpRequestMessage(Globals.HeaderNames.RunId);
-            }
-            if (!Guid.TryParse(request.GetHeaderValue(Globals.HeaderNames.TestId) ?? string.Empty, out var testId))
-            {
-                return GenerateErrorHttpRequestMessage(Globals.HeaderNames.TestId);
-            }
-
-            // Create test result and add to cache
-            var testResult = new TestResult(Guid.NewGuid(), testId, runId, request.RequestUri);
-            _memoryRepository.AddTestRun(testResult.RunId, testResult);
-
             // Add instanceId to header
-            request.Headers.Add(Globals.HeaderNames.InstanceId, testResult.InstanceId.ToString());
+            request.Headers.Add(Globals.HeaderNames.InstanceId, Guid.NewGuid().ToString());
+
+            // Add request start tick to header
+            request.Headers.Add(Globals.HeaderNames.RequestStart, DateTime.UtcNow.Ticks.ToString());
 
             return await base.SendAsync(request, cancellationToken);
-        }
-
-        private static HttpResponseMessage GenerateErrorHttpRequestMessage(string missingHeaderName)
-        {
-            return new HttpResponseMessage
-            {
-                StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Content = new StringContent($"Header '{missingHeaderName}' is required.")
-            };
         }
     }
 }

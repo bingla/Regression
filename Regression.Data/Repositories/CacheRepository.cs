@@ -9,7 +9,7 @@ namespace Regression.Data.Repositories
         private ConcurrentDictionary<Guid, HashSet<TestResult>> _testResultCache = new();
         private ConcurrentDictionary<Guid, HashSet<TestAggregate>> _testAggregate = new(); 
 
-        public void AddTestRun(Guid runId, TestResult newResult)
+        public void AddTestResult(Guid runId, TestResult newResult)
         {
             _ = _testResultCache.AddOrUpdate(runId, new HashSet<TestResult> { newResult },
                 (_, hashSet) =>

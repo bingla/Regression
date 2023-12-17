@@ -17,6 +17,9 @@ namespace Regression.Application.Services
         private readonly ITestCollectionRepository _testCollectionRepository;
         private readonly ITestResultRepository _testResultRepository;
 
+        private readonly int _defaultAgentCount = 1;
+        private readonly int _defaultIterationCount = 1;
+
         public TestRunService(IRequestService requestService,
             ICacheRepository cacheRepository,
             IScheduleRepository scheduleRepository,
@@ -70,8 +73,8 @@ namespace Regression.Application.Services
             //    - In Response-handler:
             //     - Save test results in cache
             //     - Send test results to hub (or from here if loaded from cache)
-            var numAgents = testCollection.NumAgents; // Num agents is the number of calls each endpoints gets per iteration
-            var numIterations = testCollection.NumIterations; // Number of iterations each 
+            var numAgents = testCollection.NumAgents <= 0 ? _defaultAgentCount : testCollection.NumAgents; // Num agents is the number of calls each endpoints gets per iteration
+            var numIterations = testCollection.NumIterations <= 0 ? _defaultIterationCount : testCollection.NumIterations; // Number of iterations each 
             var numMillisecondsToDelay = 1000; // Number of seconds to wait between calls, in milliseconds
             var runSettings = new RunSettings(testRunId, hubId, testCollection.AppId, testCollection.AppSecret, testCollection.XApiKey, token);
             var requests = new List<Task<HttpResponseMessage>>();
