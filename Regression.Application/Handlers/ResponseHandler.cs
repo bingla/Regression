@@ -20,7 +20,7 @@ namespace Regression.Application.Handlers
 
             // Handle response
             // Get request end date
-            var requestEnd = DateTime.Now.Ticks;
+            var requestEnd = DateTime.UtcNow.Ticks;
 
             // Var get testId and runId from request header
             _ = Guid.TryParse(request.GetHeaderValue(Globals.HeaderNames.InstanceId) ?? string.Empty, out var instanceId);

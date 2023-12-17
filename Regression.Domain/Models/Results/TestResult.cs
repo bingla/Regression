@@ -9,7 +9,7 @@ namespace Regression.Domain.Models.Results
         public Guid InstanceId { get; init; }
         public Guid TestId { get; init; }
         public Guid RunId { get; init; }
-        public long RequestStart { get; init; } = DateTime.Now.Ticks;
+        public long RequestStart { get; init; } = DateTime.UtcNow.Ticks;
         public long RequestEnd { get; set; }
         public TimeSpan RequestTime { get { return TimeSpan.FromTicks(RequestEnd) - TimeSpan.FromTicks(RequestStart); } }
         public Uri? Uri { get; init; }

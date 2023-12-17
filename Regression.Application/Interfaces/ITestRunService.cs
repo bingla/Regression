@@ -2,7 +2,7 @@
 
 namespace Regression.Application.Interfaces
 {
-    public interface IRunService
+    public interface ITestRunService
     {
         Task<RunResult> RunTest(Guid scheduleId, CancellationToken token);
     }

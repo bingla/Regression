@@ -4,9 +4,9 @@ using Regression.Domain.Entities;
 
 namespace Regression.Data.Repositories
 {
-    public class RunRepository : GeneralRepository<TestRun>, IRunRepository
+    public class TestRunRepository : GeneralRepository<TestRun>, ITestRunRepository
     {
-        public RunRepository(RegressionContext context) : base(context)
+        public TestRunRepository(RegressionContext context) : base(context)
         { }
     }
 }

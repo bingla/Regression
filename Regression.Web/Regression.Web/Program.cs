@@ -30,9 +30,9 @@ builder.Services
     .AddTransient<ITestCollectionRepository, TestCollectionRepository>()
     .AddTransient<ITestResultRepository, TestResultRepository>()
     .AddTransient<ITestRepository, TestRepository>()
-    .AddTransient<IRunRepository, RunRepository>()
+    .AddTransient<ITestRunRepository, TestRunRepository>()
     .AddTransient<IRequestService, RequestService>()
-    .AddTransient<IRunService, RunService>()
+    .AddTransient<ITestRunService, TestRunService>()
     .AddTransient<RequestHandler>()
     .AddTransient<ResponseHandler>();
 

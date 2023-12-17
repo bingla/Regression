@@ -2,6 +2,6 @@
 
 namespace Regression.Data.Interfaces
 {
-    public interface IRunRepository : IGeneralRepository<TestRun>
+    public interface ITestRunRepository : IGeneralRepository<TestRun>
     { }
 }

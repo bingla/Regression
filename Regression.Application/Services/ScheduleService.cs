@@ -11,11 +11,11 @@ namespace Regression.Application.Services
     {
         private readonly IScheduleRepository _scheduleRepository;
         private readonly ITestCollectionRepository _testCollectionRepository;
-        private readonly IRunService _runService;
+        private readonly ITestRunService _runService;
 
         public ScheduleService(IScheduleRepository scheduleRepository,
             ITestCollectionRepository testCollectionRepository,
-            IRunService runService)
+            ITestRunService runService)
         {
             _scheduleRepository = scheduleRepository;
             _testCollectionRepository = testCollectionRepository;
