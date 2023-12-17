@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Regression.Domain.Entities;
 
 namespace Regression.Data
@@ -20,8 +21,7 @@ namespace Regression.Data
         public static ModelBuilder Build_Schedule(this ModelBuilder builder)
         {
             builder.Entity<Schedule>().HasKey(p => p.Id);
-            builder.Entity<Schedule>().HasOne<TestRun>();
-            
+
             return builder;
         }
 

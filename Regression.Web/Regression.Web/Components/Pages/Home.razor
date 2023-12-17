@@ -19,6 +19,6 @@ Welcome to your new app.
             RunId = Guid.NewGuid(),
             TestId = Guid.NewGuid()
         };
-        var response = await _requestService.SendAsync(HttpMethod.Get, "http://www.google.com", runSettings);
+        var response = await _requestService.SendAsync(HttpMethod.Get, "http://www.google.com", runSettings.TestId, runSettings);
     }
 }

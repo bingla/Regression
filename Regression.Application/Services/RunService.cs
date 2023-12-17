@@ -31,13 +31,6 @@ namespace Regression.Application.Services
             _testResultRepository = testResultRepository;
         }
 
-        public async Task<RunResult> RunTest(Guid scheduleId)
-        {
-            // Define the cancellation token.
-            CancellationTokenSource source = new CancellationTokenSource();
-            return await RunTest(scheduleId, source.Token);
-        }
-
         public async Task<RunResult> RunTest(Guid scheduleId, CancellationToken token)
         {
             // Get schedule 

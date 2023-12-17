@@ -49,15 +49,15 @@ namespace Regression.Application.Services
                 // Each recuring day needs to be scheduled independently
                 foreach (var item in schedule.ScheduleAt)
                 {
-                    var scheduleName = $"{schedule.Id}_{item.Day}";
+                    var scheduleName = $"{scheduleId}_{item.Day}";
                     var cronExpression = $"{item.Time.Minute} {item.Time.Hour} * * {(int)item.Day}";
-                    RecurringJob.AddOrUpdate(scheduleName, () => _runService.RunTest(scheduleId), cronExpression);
+                    RecurringJob.AddOrUpdate(scheduleName, () => _runService.RunTest(scheduleId, CancellationToken.None), cronExpression);
                 }
             }
             else
             {
                 // Run job immediately
-                BackgroundJob.Enqueue(() => _runService.RunTest(scheduleId));
+                BackgroundJob.Enqueue(() => _runService.RunTest(scheduleId, CancellationToken.None));
             }
 
             return await Task.FromResult(new ScheduleResult());

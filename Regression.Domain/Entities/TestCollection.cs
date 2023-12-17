@@ -20,7 +20,7 @@ namespace Regression.Domain.Entities
         public string? AppSecret { get; set; }
         public string? XApiKey { get; set; }
 
-        public virtual ICollection<TestRun> Runs { get; set; } = new HashSet<TestRun>();
+        public virtual ICollection<TestRun> Runs { get; init; } = new HashSet<TestRun>();
         public virtual ICollection<Test> Tests { get; init; } = new HashSet<Test>();
         public virtual ICollection<TestResult> Results { get; init; } = new HashSet<TestResult>();
     }

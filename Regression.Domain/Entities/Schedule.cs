@@ -8,10 +8,11 @@ namespace Regression.Domain.Entities
         [Key]
         public Guid Id { get; set; }
         public Guid TestCollectionId { get; set; }
-        public ICollection<ScheduleItem> ScheduleAt { get; set; } = new List<ScheduleItem>();
+        public ICollection<ScheduleItem> ScheduleAt { get; init; } = new List<ScheduleItem>();
         public bool Recurring { get; set; }
         public bool Enabled { get; set; }
 
         public virtual TestCollection? TestCollection { get; set; }
+        public virtual ICollection<TestRun> TestRuns { get; init; } = new HashSet<TestRun>();
     }
 }

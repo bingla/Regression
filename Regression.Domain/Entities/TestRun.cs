@@ -17,6 +17,6 @@ namespace Regression.Domain.Entities
         public bool Aborted { get; set; }
 
         public virtual TestCollection? TestCollection { get; set; }
-        public virtual ICollection<TestResult> Results { get; set; } = new HashSet<TestResult>();
+        public virtual ICollection<TestResult> Results { get; init; } = new HashSet<TestResult>();
     }
 }
