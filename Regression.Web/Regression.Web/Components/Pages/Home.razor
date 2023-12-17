@@ -1,0 +1,24 @@
+﻿@using Regression.Application.Interfaces
+@using Regression.Domain.Models.Settings
+
+@page "/"
+@inject IRequestService _requestService
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate http call
+        var runSettings = new RunSettings
+        {
+            RunId = Guid.NewGuid(),
+            TestId = Guid.NewGuid()
+        };
+        var response = await _requestService.SendAsync(HttpMethod.Get, "http://www.google.com", runSettings);
+    }
+}
