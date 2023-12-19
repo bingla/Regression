@@ -1,8 +1,17 @@
 ﻿@using Regression.Application.Interfaces
+@using Regression.Data
+@using Regression.Data.Interfaces
+@using Regression.Domain
+@using Regression.Domain.Entities
 @using Regression.Domain.Models.Settings
 
 @page "/"
+@inject RegressionContext _context
+@inject IScheduleRepository _scheduleRepository
+@inject IScheduleService _scheduleService
+@inject ITestRunService _testrunService
 @inject IRequestService _requestService
+
 
 <PageTitle>Home</PageTitle>
 
@@ -14,12 +23,20 @@ Welcome to your new app.
     protected override async Task OnInitializedAsync()
     {
         // Simulate http call
-        var runSettings = new RunSettings
-        {
-            RunId = Guid.NewGuid(),
-            TestId = Guid.NewGuid()
-        };
-        var uri = new Uri("https://api.oceandrivers.com/v1.0/getEasyWind/EW013/");
-        var response = await _requestService.SendAsync(HttpMethod.Get, uri, runSettings.TestId, runSettings);
+        // var runSettings = new RunSettings
+        // {
+        //     RunId = Guid.NewGuid(),
+        //     TestId = Guid.NewGuid()
+        // };
+        // var uri = new Uri("https://api.oceandrivers.com/v1.0/getEasyWind/EW013/");
+        // var response = await _requestService.SendAsync(HttpMethod.Get, uri, runSettings.TestId, runSettings);
+        _context.Seed();
+
+        var testCollection = _context.TestCollections.FirstOrDefault();
+        if (testCollection == default)
+            throw new Exception();
+
+        // Schedule a test
+        var scheduleResult = await _scheduleService.ScheduleTest(new ScheduleSettings { TestCollectionId = testCollection.Id });
     }
 }

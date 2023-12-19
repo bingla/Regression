@@ -20,15 +20,15 @@ namespace Regression.Application.Services
             return await _httpClient.SendAsync(AddHeaders(request, testId, settings), settings.CancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<HttpResponseMessage> SendAsync(HttpMethod method, Uri uri, Guid testId, RunSettings settings)
+        public async Task<HttpResponseMessage> SendAsync(Domain.Enums.HttpMethod method, Uri uri, Guid testId, RunSettings settings)
         {
-            var request = AddHeaders(new HttpRequestMessage(method, uri), testId, settings);
+            var request = AddHeaders(new HttpRequestMessage(ParseHttpMethod(method), uri), testId, settings);
             return await SendAsync(request, testId, settings);
         }
 
-        public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, Guid testId, RunSettings settings)
+        public async Task<HttpResponseMessage> SendAsync(Domain.Enums.HttpMethod method, string url, Guid testId, RunSettings settings)
         {
-            var request = AddHeaders(new HttpRequestMessage(method, url), testId, settings);
+            var request = AddHeaders(new HttpRequestMessage(ParseHttpMethod(method), url), testId, settings);
             return await SendAsync(request, testId, settings);
         }
 
@@ -46,6 +46,17 @@ namespace Regression.Application.Services
             // TODO: Add AuthHeader
 
             return request;
+        }
+
+        private static HttpMethod ParseHttpMethod(Domain.Enums.HttpMethod method)
+        {
+            return method switch
+            {
+                Domain.Enums.HttpMethod.POST => HttpMethod.Post,
+                Domain.Enums.HttpMethod.PUT => HttpMethod.Put,
+                Domain.Enums.HttpMethod.TRACE => HttpMethod.Trace,
+                _ => HttpMethod.Get,
+            };
         }
     }
 }

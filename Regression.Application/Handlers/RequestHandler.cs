@@ -1,7 +1,5 @@
-﻿using Regression.Application.Extensions;
-using Regression.Data.Interfaces;
+﻿using Regression.Data.Interfaces;
 using Regression.Domain;
-using Regression.Domain.Models.Results;
 
 namespace Regression.Application.Handlers
 {

@@ -6,6 +6,6 @@
         public Guid TestCollectionId { get; set; }
         public ICollection<ScheduleItem> ScheduleAt { get; set; } = new List<ScheduleItem>();
         public bool Recurring { get; set; }
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
     }
 }

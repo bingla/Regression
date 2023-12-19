@@ -1,5 +1,4 @@
-﻿using Regression.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Environment = Regression.Domain.Enums.Environment;
 
 namespace Regression.Domain.Entities

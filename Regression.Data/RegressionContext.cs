@@ -9,17 +9,10 @@ namespace Regression.Domain
         public DbSet<TestCollection> TestCollections { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
         public DbSet<Test> Tests { get; set; }
-        public DbSet<TestRun> Runs { get; set; }
+        public DbSet<TestRun> TestRuns { get; set; }
 
         public RegressionContext(DbContextOptions<RegressionContext> options) : base(options)
         { }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder
-        //        .UseInMemoryDatabase("RegressionDB")
-        //        .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
-        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

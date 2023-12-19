@@ -81,9 +81,9 @@ namespace Regression.Application.Services
 
             try
             {
-                for (var iteration = 0; numIterations < iteration; iteration++)
+                for (var iteration = 0; iteration < numIterations; iteration++)
                 {
-                    for (var agent = 0; numAgents < agent; agent++)
+                    for (var agent = 0; agent < numAgents; agent++)
                     {
                         testCollection.Tests.AsParallel().ForAll((test) =>
                         {

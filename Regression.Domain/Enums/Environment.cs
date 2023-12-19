@@ -5,6 +5,6 @@
         None = 0,
         Develop = 1,
         Test = 2,
-        Prod = 3
+        Production = 3
     }
 }

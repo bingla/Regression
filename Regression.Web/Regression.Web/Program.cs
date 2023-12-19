@@ -32,6 +32,7 @@ builder.Services
     .AddTransient<ITestRepository, TestRepository>()
     .AddTransient<ITestRunRepository, TestRunRepository>()
     .AddTransient<IRequestService, RequestService>()
+    .AddTransient<IScheduleService, ScheduleService>()
     .AddTransient<ITestRunService, TestRunService>()
     .AddTransient<RequestHandler>()
     .AddTransient<ResponseHandler>();

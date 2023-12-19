@@ -9,7 +9,8 @@ namespace Regression.Domain.Entities
     {
         [Key]
         public Guid Id { get; set; }
-        public HttpMethod Method { get; set; } = HttpMethod.Get;
+        public Guid TestCollectionId { get; set; }
+        public Enums.HttpMethod Method { get; set; } = Enums.HttpMethod.GET;
         public Uri? Uri { get; set; }
         public string? Url { get; set; }
 

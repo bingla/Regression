@@ -7,7 +7,7 @@ namespace Regression.Data.Repositories
     public class CacheRepository : ICacheRepository
     {
         private ConcurrentDictionary<Guid, HashSet<TestResult>> _testResultCache = new();
-        private ConcurrentDictionary<Guid, HashSet<TestAggregate>> _testAggregate = new(); 
+        private ConcurrentDictionary<Guid, HashSet<TestAggregate>> _testAggregate = new();
 
         public void AddTestResult(Guid runId, TestResult newResult)
         {

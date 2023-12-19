@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Regression.Domain.Models.Settings;
+﻿using Regression.Domain.Models.Settings;
+using System.ComponentModel.DataAnnotations;
 
 namespace Regression.Domain.Entities
 {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 using Regression.Domain.Entities;
+using Regression.Domain.Models.Settings;
 
 namespace Regression.Data
 {
@@ -9,28 +10,11 @@ namespace Regression.Data
         public static ModelBuilder BuildModels(this ModelBuilder builder)
         {
             builder
-                .Build_Schedule()
-                .Build_Run()
                 .Build_Test()
                 .Build_TestCollection()
+                .Build_Schedule()
+                .Build_TestRun()
                 .Build_TestResult();
-
-            return builder;
-        }
-
-        public static ModelBuilder Build_Schedule(this ModelBuilder builder)
-        {
-            builder.Entity<Schedule>().HasKey(p => p.Id);
-
-            return builder;
-        }
-
-        public static ModelBuilder Build_Run(this ModelBuilder builder)
-        {
-            builder.Entity<TestRun>().HasKey(p => p.Id);
-            builder.Entity<TestRun>()
-                .HasOne(p => p.TestCollection)
-                .WithMany(p => p.Runs);
 
             return builder;
         }
@@ -52,6 +36,34 @@ namespace Regression.Data
                 .HasMany(p => p.Tests)
                 .WithOne(p => p.TestCollection)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            return builder;
+        }
+
+        public static ModelBuilder Build_Schedule(this ModelBuilder builder)
+        {
+            builder.Entity<Schedule>().HasKey(p => p.Id);
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            builder.Entity<Schedule>()
+                .Property(p => p.ScheduleAt)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v, jsonSettings),
+                    v => JsonConvert.DeserializeObject<List<ScheduleItem>>(v, jsonSettings));
+
+            return builder;
+        }
+
+        public static ModelBuilder Build_TestRun(this ModelBuilder builder)
+        {
+            builder.Entity<TestRun>().HasKey(p => p.Id);
+            builder.Entity<TestRun>()
+                .HasOne(p => p.TestCollection)
+                .WithMany(p => p.Runs);
 
             return builder;
         }
