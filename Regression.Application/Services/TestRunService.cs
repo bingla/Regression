@@ -65,7 +65,7 @@ namespace Regression.Application.Services
             // TODO: Connect to hub
 
             // TODO: Mark Test Run as started in DB
-            testRun = await _testRunRepository.CreateAsync(testRun);
+            //testRun = await _testRunRepository.CreateAsync(testRun);
 
             // TODO: Start test
             // - For each iteration...
@@ -102,54 +102,48 @@ namespace Regression.Application.Services
             }
             catch (Exception ex) when (ex is TaskCanceledException or OperationCanceledException)
             {
-                testRun.Aborted = true;
-                testRun = await _testRunRepository.UpdateAsync(testRun);
+                // Disconnect from Hub
+
+                // Try to save some results even if the run was interrupted 
+                testRun = await CompileAndSaveTestRun(testRun, false);
                 throw;
             }
-            finally
-            {
-                // TODO: Disconnect from Hub
-            }
 
-            // TODO: Fetch TestResult from cache
-            var runResult = _cacheRepository.GetTestRun(testRunId);
+            // Disconnect from Hub
 
-            // TODO: Compile TestResults
-            var testResults = runResult.Select(p => new Domain.Entities.TestResult
-            {
-                Id = p.InstanceId,
-                RunId = p.RunId,
-                TestId = p.TestId,
-                RequestTime = p.RequestTime,
-                Run = testRun,
-            })
-            .ToList();
-
-            // TODO: Save TestResults  to DB
-            await _testResultRepository.CreateAsync(testResults);
-
-            // TODO: Compile TestResults and add to Run
-            runResult.AsParallel().ForAll(p =>
-            {
-                testRun.Results.Add(new Domain.Entities.TestResult
-                {
-                    Id = p.InstanceId,
-                    RunId = p.RunId,
-                    TestId = p.TestId,
-                    RequestTime = p.RequestTime,
-                    Run = testRun,
-                });
-            });
-
-            // TODO: Mark Test run as finished and save to DB
-            testRun.Completed = true;
-            testRun.RunEnd = DateTime.Now;
-            testRun = await _testRunRepository.UpdateAsync(testRun);
-
-            // TODO: Purge test run from cache
-            _cacheRepository.PurgeTestRun(testRunId);
+            // Compile and Save the result
+            testRun = await CompileAndSaveTestRun(testRun, true);
 
             return await Task.FromResult(new RunResult());
+        }
+
+        internal async Task<TestRun> CompileAndSaveTestRun(TestRun testRun, bool testRunCompleted)
+        {
+            // Fetch TestResult from cache
+            var runResult = _cacheRepository.GetTestRun(testRun.Id);
+
+            // Compile TestResults and add to TestRun
+            if (runResult != default && runResult.Count != 0)
+            {
+                runResult.ToList().ForEach(p =>
+                {
+                    testRun.Results.Add(new Domain.Entities.TestResult
+                    {
+                        Id = p.InstanceId,
+                        RunId = p.RunId,
+                        TestId = p.TestId,
+                        RequestTime = p.RequestTime,
+                        Run = testRun,
+                    });
+                });
+
+                _cacheRepository.PurgeTestRun(testRun.Id);
+            }
+
+            testRun.Completed = testRunCompleted;
+            testRun.RunEnd = DateTime.Now;
+
+            return await _testRunRepository.CreateAsync(testRun);
         }
     }
 }

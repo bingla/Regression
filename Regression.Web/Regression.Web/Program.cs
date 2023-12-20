@@ -17,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RegressionContext>(options =>
 {
     options.UseInMemoryDatabase("RegressionDb");
+    options.EnableDetailedErrors();
+    options.EnableSensitiveDataLogging();
     options.ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
 }, ServiceLifetime.Scoped);
 
