@@ -6,8 +6,8 @@ namespace Regression.Data.Repositories
 {
     public class GeneralRepository<T> : IGeneralRepository<T> where T : class
     {
-        internal readonly RegressionContext _context;
-        private readonly DbSet<T> _dbSet;
+        protected readonly RegressionContext _context;
+        protected readonly DbSet<T> _dbSet;
 
         public GeneralRepository(RegressionContext context)
         {

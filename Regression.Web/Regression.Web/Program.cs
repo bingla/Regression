@@ -30,7 +30,6 @@ builder.Services
     .AddSingleton<ICacheRepository, CacheRepository>()
     .AddTransient<IScheduleRepository, ScheduleRepository>()
     .AddTransient<ITestCollectionRepository, TestCollectionRepository>()
-    .AddTransient<ITestResultRepository, TestResultRepository>()
     .AddTransient<ITestRepository, TestRepository>()
     .AddTransient<ITestRunRepository, TestRunRepository>()
     .AddTransient<IRequestService, RequestService>()

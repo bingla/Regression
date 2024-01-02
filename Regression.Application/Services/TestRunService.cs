@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using Microsoft.EntityFrameworkCore;
 using Regression.Application.Interfaces;
 using Regression.Data.Interfaces;
 using Regression.Domain.Entities;
@@ -15,24 +14,22 @@ namespace Regression.Application.Services
         private readonly IScheduleRepository _scheduleRepository;
         private readonly ITestRunRepository _testRunRepository;
         private readonly ITestCollectionRepository _testCollectionRepository;
-        private readonly ITestResultRepository _testResultRepository;
 
         private readonly int _defaultAgentCount = 1;
         private readonly int _defaultIterationCount = 1;
+        private readonly List<Task<HttpResponseMessage>> _requests = new List<Task<HttpResponseMessage>>();
 
         public TestRunService(IRequestService requestService,
             ICacheRepository cacheRepository,
             IScheduleRepository scheduleRepository,
             ITestRunRepository testRunRepository,
-            ITestCollectionRepository testCollectionRepository,
-            ITestResultRepository testResultRepository)
+            ITestCollectionRepository testCollectionRepository)
         {
             _requestService = requestService;
             _cacheRepository = cacheRepository;
             _scheduleRepository = scheduleRepository;
             _testRunRepository = testRunRepository;
             _testCollectionRepository = testCollectionRepository;
-            _testResultRepository = testResultRepository;
         }
 
         [AutomaticRetry(Attempts = 3)]
@@ -44,16 +41,14 @@ namespace Regression.Application.Services
                 throw new Exception();
 
             // Get TestCollection (and all tests) on this schedule
-            var testCollection = await _testCollectionRepository.Get(e => e.Include(p => p.Tests))
-                .FirstOrDefaultAsync(e => e.Id == schedule.TestCollectionId);
+            var testCollection = await _testCollectionRepository.GetTestCollectionWithTestsAsync(schedule.TestCollectionId);
             if (testCollection == default)
                 throw new Exception();
 
-            // TODO: Create a new Run and connect Run to TestCollection
-            var testRunId = Guid.NewGuid();
+            // TODO: Create a new TestRun and connect to TestCollection
             var testRun = new TestRun
             {
-                Id = testRunId,
+                Id = Guid.NewGuid(),
                 TestCollectionId = schedule.TestCollectionId,
                 ScheduledAt = DateTime.Now,
                 RunStart = DateTime.Now,
@@ -64,9 +59,6 @@ namespace Regression.Application.Services
 
             // TODO: Connect to hub
 
-            // TODO: Mark Test Run as started in DB
-            //testRun = await _testRunRepository.CreateAsync(testRun);
-
             // TODO: Start test
             // - For each iteration...
             //  - Start sending requests to test endpoints
@@ -76,8 +68,7 @@ namespace Regression.Application.Services
             var numAgents = testCollection.NumAgents <= 0 ? _defaultAgentCount : testCollection.NumAgents; // Num agents is the number of calls each endpoints gets per iteration
             var numIterations = testCollection.NumIterations <= 0 ? _defaultIterationCount : testCollection.NumIterations; // Number of iterations each 
             var numMillisecondsToDelay = 1000; // Number of seconds to wait between calls, in milliseconds
-            var runSettings = new RunSettings(testRunId, hubId, testCollection.AppId, testCollection.AppSecret, testCollection.XApiKey, token);
-            var requests = new List<Task<HttpResponseMessage>>();
+            var runSettings = new RunSettings(testRun.Id, hubId, testCollection.AppId, testCollection.AppSecret, testCollection.XApiKey, token);
 
             try
             {
@@ -88,7 +79,7 @@ namespace Regression.Application.Services
                         testCollection.Tests.AsParallel().ForAll((test) =>
                         {
                             // Send request
-                            requests.Add(_requestService.SendAsync(test.Method, test.Uri, test.Id, runSettings));
+                            _requests.Add(_requestService.SendAsync(test.Method, test.Uri, test.Id, runSettings));
                         });
                     }
 
@@ -98,13 +89,13 @@ namespace Regression.Application.Services
 
                 // Wait here until all requests are done but throw if cancellation requested
                 token.ThrowIfCancellationRequested();
-                await Task.WhenAll(requests.ToArray());
+                await Task.WhenAll(_requests.ToArray());
             }
             catch (Exception ex) when (ex is TaskCanceledException or OperationCanceledException)
             {
                 // Disconnect from Hub
 
-                // Try to save some results even if the run was interrupted 
+                // Try to save results even if the run was interrupted 
                 testRun = await CompileAndSaveTestRun(testRun, false);
                 throw;
             }
@@ -125,17 +116,33 @@ namespace Regression.Application.Services
             // Compile TestResults and add to TestRun
             if (runResult != default && runResult.Count != 0)
             {
-                runResult.ToList().ForEach(p =>
+                // Group by test
+                var groupByTest = runResult
+                    .GroupBy(p => p.TestId, p => p)
+                    .ToDictionary(p => p.Key, p => p.ToList());
+
+                // For each test/group of test...
+                foreach (var group in groupByTest)
                 {
-                    testRun.Results.Add(new Domain.Entities.TestResult
-                    {
-                        Id = p.InstanceId,
-                        RunId = p.RunId,
-                        TestId = p.TestId,
-                        RequestTime = p.RequestTime,
-                        Run = testRun,
-                    });
-                });
+                    // TODO: Group testresults by requestStart, sorted into groups of 1 second
+                    group.Value
+                        .OrderBy(p => p.RequestStart)
+                        .GroupBy(p => p.RequestStart / TimeSpan.FromSeconds(1).Ticks) // Groups of 1 second
+                        .Select(p => new Domain.Entities.TestResultAggregate
+                        {
+                            Id = p.First().InstanceId,
+                            TestId = p.First().TestId,
+                            TestRunId = testRun.Id,
+                            CreatedAt = p.First().RequestStart,
+                            NumSuccessful = p.Count(p => p.TestStatusCode == TestStatusCode.Ok),
+                            NumUnsuccessful = p.Count(p => p.TestStatusCode != TestStatusCode.Ok),
+                            Min = p.Min(p => p.RequestTime),
+                            Max = p.Max(p => p.RequestTime),
+                            Average = TimeSpan.FromTicks((long)p.Average(p => p.RequestTime.Ticks))
+                        })
+                        .ToList()
+                        .ForEach(testRun.Results.Add);
+                }
 
                 _cacheRepository.PurgeTestRun(testRun.Id);
             }

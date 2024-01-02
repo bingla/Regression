@@ -14,7 +14,7 @@ namespace Regression.Data
                 .Build_TestCollection()
                 .Build_Schedule()
                 .Build_TestRun()
-                .Build_TestResult();
+                .Build_TestResultAggregate();
 
             return builder;
         }
@@ -68,11 +68,17 @@ namespace Regression.Data
             return builder;
         }
 
-        public static ModelBuilder Build_TestResult(this ModelBuilder builder)
+        public static ModelBuilder Build_TestResultAggregate(this ModelBuilder builder)
         {
-            builder.Entity<TestResult>().HasKey(p => p.Id);
-            builder.Entity<TestResult>()
+            builder.Entity<TestResultAggregate>().HasKey(p => p.Id);
+            
+            builder.Entity<TestResultAggregate>()
                 .HasOne(p => p.Test)
+                .WithMany(p => p.Results)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<TestResultAggregate>()
+                .HasOne(p => p.TestRun)
                 .WithMany(p => p.Results)
                 .OnDelete(DeleteBehavior.Cascade);
 

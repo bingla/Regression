@@ -21,6 +21,6 @@ namespace Regression.Domain.Entities
 
         public virtual ICollection<TestRun> Runs { get; init; } = new HashSet<TestRun>();
         public virtual ICollection<Test> Tests { get; init; } = new HashSet<Test>();
-        public virtual ICollection<TestResult> Results { get; init; } = new HashSet<TestResult>();
+        public virtual ICollection<TestResultAggregate> Results { get; init; } = new HashSet<TestResultAggregate>();
     }
 }

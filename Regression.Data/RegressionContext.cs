@@ -7,7 +7,6 @@ namespace Regression.Domain
     public class RegressionContext : DbContext
     {
         public DbSet<TestCollection> TestCollections { get; set; }
-        public DbSet<TestResult> TestResults { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<TestRun> TestRuns { get; set; }
 
